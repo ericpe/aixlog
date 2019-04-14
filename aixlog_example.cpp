@@ -26,6 +26,8 @@ int main(int /*argc*/, char** /*argv*/)
 		{
 			/// Log everything into file "all.log"
 			make_shared<AixLog::SinkFile>(AixLog::Severity::trace, AixLog::Type::all, "all.log"),
+			/// Log everything to file "formatted.log" using new #file and #line types
+			make_shared<AixLog::SinkFile>(AixLog::Severity::trace, AixLog::Type::all, "formatted.log", "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message"),
 			/// Log normal (i.e. non-special) logs to SinkCout
 			make_shared<AixLog::SinkCout>(AixLog::Severity::trace, AixLog::Type::normal, "cout: %Y-%m-%d %H-%M-%S.#ms [#severity] (#tag_func) #message"),
 			/// Log error and higher severity messages to cerr

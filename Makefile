@@ -17,5 +17,5 @@ $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(BIN) $(OBJ) *~
+	rm -rf $(BIN) $(OBJ) *~ all.log special.log formatted.log
 

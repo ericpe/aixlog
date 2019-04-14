@@ -662,6 +662,14 @@ protected:
 		if (pos != std::string::npos)
 			result.replace(pos, 9, metadata.tag?metadata.tag.text:(metadata.function?metadata.function.name:"log"));
 
+		pos = result.find("#file");
+		if (pos != std::string::npos)
+			result.replace(pos, 5, metadata.function.file.empty()?"":metadata.function.file);
+
+		pos = result.find("#line");
+		if (pos != std::string::npos)
+			result.replace(pos, 5, metadata.function.line ? std::to_string(metadata.function.line) : "");
+
 		pos = result.find("#tag");
 		if (pos != std::string::npos)
 			result.replace(pos, 4, metadata.tag?metadata.tag.text:"");
