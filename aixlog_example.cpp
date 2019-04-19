@@ -13,6 +13,7 @@
 
 
 #include "aixlog.hpp"
+#include "rotation_strategy.hpp"
 
 using namespace std;
 
@@ -28,6 +29,16 @@ int main(int /*argc*/, char** /*argv*/)
 			make_shared<AixLog::SinkFile>(AixLog::Severity::trace, AixLog::Type::all, "all.log"),
 			/// Log everything to file "formatted.log" using new #file and #line types
 			make_shared<AixLog::SinkFile>(AixLog::Severity::trace, AixLog::Type::all, "formatted.log", "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message"),
+			/// Log everything to file "strategy.log" using new #file and #line types, as well as a strategy
+			make_shared<AixLog::SinkFile>(AixLog::SinkFile::Strategy(AixLog::Severity::trace, AixLog::Type::all, "strategy.log", "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message")),
+			/// Log everything to file "rotation.log" using new #file and #line types, as well as rotation_strategy with a 5k rotation  size and keep 3 rotations
+			make_shared<AixLog::SinkFile>(rotation_strategy(AixLog::Severity::trace,
+						                                          AixLog::Type::all,
+						                                          "rotation.log",
+						                                          "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message",
+						                                          true,
+						                                          3,
+						                                          5*1024)),
 			/// Log normal (i.e. non-special) logs to SinkCout
 			make_shared<AixLog::SinkCout>(AixLog::Severity::trace, AixLog::Type::normal, "cout: %Y-%m-%d %H-%M-%S.#ms [#severity] (#tag_func) #message"),
 			/// Log error and higher severity messages to cerr

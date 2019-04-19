@@ -742,11 +742,36 @@ struct SinkCerr : public SinkFormat
  */
 struct SinkFile : public SinkFormat
 {
+  struct Strategy
+  {
+    Strategy(Severity s,
+             Type t,
+             const std::string& fn,
+             const std::string& fmt = "%Y-%m-%d %H-%M-%S.#ms [#severity] (#tag_func)")
+    : severity(s), type(t), filename(fn), format(fmt)
+    { }
+
+    virtual void open(std::ofstream& ofs)const
+    {
+      ofs.open(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+    }
+
+    Severity severity;
+    Type type;
+    std::string filename;
+    std::string format;
+  };
+
 	SinkFile(Severity severity, Type type, const std::string& filename, const std::string& format = "%Y-%m-%d %H-%M-%S.#ms [#severity] (#tag_func)") :
 		SinkFormat(severity, type, format)
 	{
 		ofs.open(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
 	}
+
+  SinkFile(const Strategy& strat) : SinkFormat(strat.severity, strat.type, strat.format)
+  {
+    strat.open(ofs);
+  }
 
 	~SinkFile() override
 	{
