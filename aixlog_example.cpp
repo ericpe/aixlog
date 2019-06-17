@@ -15,9 +15,6 @@
 #include "aixlog.hpp"
 #include "rotation_strategy.hpp"
 
-using namespace std;
-
-
 int main(int /*argc*/, char** /*argv*/)
 {
 	AixLog::Log::init<AixLog::SinkCout>(AixLog::Severity::trace, AixLog::Type::normal);
@@ -26,35 +23,35 @@ int main(int /*argc*/, char** /*argv*/)
 	AixLog::Log::init(
 		{
 			/// Log everything into file "all.log"
-			make_shared<AixLog::SinkFile>(AixLog::Severity::trace, AixLog::Type::all, "all.log"),
+			std::make_shared<AixLog::SinkFile>(AixLog::Severity::trace, AixLog::Type::all, "all.log"),
 			/// Log everything to file "formatted.log" using new #file and #line types
-			make_shared<AixLog::SinkFile>(AixLog::Severity::trace, AixLog::Type::all, "formatted.log", "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message"),
+			std::make_shared<AixLog::SinkFile>(AixLog::Severity::trace, AixLog::Type::all, "formatted.log", "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message"),
 			/// Log everything to file "strategy.log" using new #file and #line types, as well as a strategy
-			make_shared<AixLog::SinkFile>(AixLog::SinkFile::Strategy(AixLog::Severity::trace, AixLog::Type::all, "strategy.log", "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message")),
+			std::make_shared<AixLog::SinkFile>(AixLog::SinkFile::Strategy(AixLog::Severity::trace, AixLog::Type::all, "strategy.log", "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message")),
 			/// Log everything to file "rotation.log" using new #file and #line types, as well as rotation_strategy with a 5k rotation  size and keep 3 rotations
-			make_shared<AixLog::SinkFile>(rotation_strategy(AixLog::Severity::trace,
-						                                          AixLog::Type::all,
-						                                          "rotation.log",
-						                                          "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message",
-						                                          true,
-						                                          3,
-						                                          5*1024)),
+			std::make_shared<AixLog::SinkFile>(rotation_strategy(AixLog::Severity::trace,
+						                                               AixLog::Type::all,
+						                                               "rotation.log",
+						                                               "%Y%m%d %H:%M:%S.#ms #file(#line) [#severity]: #message",
+						                                               true,
+						                                               3,
+						                                               5*1024)),
 			/// Log normal (i.e. non-special) logs to SinkCout
-			make_shared<AixLog::SinkCout>(AixLog::Severity::trace, AixLog::Type::normal, "cout: %Y-%m-%d %H-%M-%S.#ms [#severity] (#tag_func) #message"),
+			std::make_shared<AixLog::SinkCout>(AixLog::Severity::trace, AixLog::Type::normal, "cout: %Y-%m-%d %H-%M-%S.#ms [#severity] (#tag_func) #message"),
 			/// Log error and higher severity messages to cerr
-			make_shared<AixLog::SinkCerr>(AixLog::Severity::error, AixLog::Type::all, "cerr: %Y-%m-%d %H-%M-%S.#ms [#severity] (#tag_func)"),
+			std::make_shared<AixLog::SinkCerr>(AixLog::Severity::error, AixLog::Type::all, "cerr: %Y-%m-%d %H-%M-%S.#ms [#severity] (#tag_func)"),
 			/// Log special logs to native log (Syslog on Linux, Android Log on Android, EventLog on Windows, Unified logging on Apple)
-			make_shared<AixLog::SinkNative>("aixlog", AixLog::Severity::trace, AixLog::Type::special),
+			std::make_shared<AixLog::SinkNative>("aixlog", AixLog::Severity::trace, AixLog::Type::special),
 			/// Callback log sink with cout logging in a lambda function
 			/// Could also do file logging
-			make_shared<AixLog::SinkCallback>(AixLog::Severity::trace, AixLog::Type::all, 
+			std::make_shared<AixLog::SinkCallback>(AixLog::Severity::trace, AixLog::Type::all, 
 				[](const AixLog::Metadata& metadata, const std::string& message)
 				{
-					cout << "Callback:\n\tmsg:   " << message << "\n\ttag:   " << metadata.tag.text << "\n\tsever: " << AixLog::Log::to_string(metadata.severity) << " (" << static_cast<int>(metadata.severity) << ")\n\ttype:  " << (metadata.type == AixLog::Type::normal?"normal":"special") << "\n";
+					std::cout << "Callback:\n\tmsg:   " << message << "\n\ttag:   " << metadata.tag.text << "\n\tsever: " << AixLog::Log::to_string(metadata.severity) << " (" << static_cast<int>(metadata.severity) << ")\n\ttype:  " << (metadata.type == AixLog::Type::normal?"normal":"special") << "\n";
 					if (metadata.timestamp)
-						cout << "\ttime:  " << metadata.timestamp.to_string() << "\n";
+						std::cout << "\ttime:  " << metadata.timestamp.to_string() << "\n";
 					if (metadata.function)
-						cout << "\tfunc:  " << metadata.function.name << "\n\tline:  " << metadata.function.line << "\n\tfile:  " << metadata.function.file << "\n";
+						std::cout << "\tfunc:  " << metadata.function.name << "\n\tline:  " << metadata.function.line << "\n\tfile:  " << metadata.function.file << "\n";
 				}
 			)
 		}
