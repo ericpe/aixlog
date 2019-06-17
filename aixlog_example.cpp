@@ -62,6 +62,8 @@ int main(int /*argc*/, char** /*argv*/)
 	/// Log special logs into file "special.log"
 	AixLog::Log::instance().add_logsink<AixLog::SinkFile>(AixLog::Severity::trace, AixLog::Type::special, "special.log");
 
+	LOG(INFO) << "Line 1";
+	LOG(INFO) << "Line 2";
 	/// Log with info severity
 	LOG(INFO) << "LOG(INFO)\n";
 	/// ... with a tag
