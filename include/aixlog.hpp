@@ -115,6 +115,8 @@
 #define SPECIAL AixLog::Type::special
 #define TIMESTAMP AixLog::Timestamp(std::chrono::system_clock::now())
 
+// usage: WOULDLOG(SEVERITY)
+#define WOULDLOG(SEVERITY_) AixLog::Log::instance().wouldLog(static_cast<AixLog::Severity>(SEVERITY_))
 
 /**
  * @brief
@@ -454,14 +456,14 @@ protected:
 
 
 /// ostream operators << for the meta data structs
-static std::ostream& operator<< (std::ostream& os, const Severity& log_severity);
-static std::ostream& operator<< (std::ostream& os, const Type& log_type);
-static std::ostream& operator<< (std::ostream& os, const Timestamp& timestamp);
-static std::ostream& operator<< (std::ostream& os, const Tag& tag);
-static std::ostream& operator<< (std::ostream& os, const Function& function);
-static std::ostream& operator<< (std::ostream& os, const Conditional& conditional);
-static std::ostream& operator<< (std::ostream& os, const Color& color);
-static std::ostream& operator<< (std::ostream& os, const TextColor& text_color);
+static std::ostream& operator<< (std::ostream& os, const Severity& log_severity) __attribute__((unused));
+static std::ostream& operator<< (std::ostream& os, const Type& log_type) __attribute__((unused));
+static std::ostream& operator<< (std::ostream& os, const Timestamp& timestamp) __attribute__((unused));
+static std::ostream& operator<< (std::ostream& os, const Tag& tag) __attribute__((unused));
+static std::ostream& operator<< (std::ostream& os, const Function& function) __attribute__((unused));
+static std::ostream& operator<< (std::ostream& os, const Conditional& conditional) __attribute__((unused));
+static std::ostream& operator<< (std::ostream& os, const Color& color) __attribute__((unused));
+static std::ostream& operator<< (std::ostream& os, const TextColor& text_color) __attribute__((unused));
 
 using log_sink_ptr = std::shared_ptr<Sink>;
 
@@ -550,6 +552,21 @@ public:
 		}
 	}
 
+  bool wouldLog(Severity logSeverity)
+  {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    for (const auto& sink: log_sinks_)
+    {
+      if (
+          (metadata_.type == Type::all) ||
+          (sink->get_type() == Type::all) ||
+          (metadata_.type == sink->get_type())
+      )
+        if (metadata_.severity >= sink->severity)
+          return true;
+    }
+    return false;
+  }
 
 protected:
 	Log() noexcept
